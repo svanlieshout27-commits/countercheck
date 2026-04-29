@@ -8,10 +8,11 @@ venv/
 node_modules/
 .next/
 
-# Data (we'll add big files later)
-data/listings.jsonl
-data/*.csv
-*.joblib
+# Data — keep labels and synthetic data committed for reproducibility,
+# but exclude any large/sensitive review outputs
+data/false_positives.csv
+*.xlsx
+data/false_positives.csv
 
 # OS
 .DS_Store
