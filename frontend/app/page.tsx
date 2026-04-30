@@ -143,23 +143,37 @@ export default function Home() {
             <p className="text-gray-700 whitespace-pre-wrap">{result.explanation}</p>
           </div>
         )}
-
-        <footer className="mt-10 text-xs text-gray-500 text-center leading-relaxed">
-          CounterCheck is a portfolio demo. The classifier was trained on 100
-          hand-labeled listings and is intended to illustrate a hybrid ML + LLM
-          architecture, not as a production tool. Edge cases (especially novel
-          digit-substitution patterns and brand spellings outside the training
-          set) may be misclassified. See the{" "}
-          <a
-            href="https://github.com/svanlieshout27-commits/countercheck"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-gray-700"
-          >
-            GitHub repo
-          </a>{" "}
-          for the full methodology and limitations.
-        </footer>
+    
+        <footer className="mt-10 text-xs text-gray-500 text-center leading-relaxed space-y-2">
+  <p>
+    CounterCheck is a portfolio demo. The classifier was trained on 100
+    hand-labeled listings and is intended to illustrate a hybrid ML + LLM
+    architecture, not as a production tool. Edge cases (especially novel
+    digit-substitution patterns and brand spellings outside the training
+    set) may be misclassified. See the{" "}
+    <a
+      href="https://github.com/svanlieshout27-commits/countercheck"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline hover:text-gray-700"
+    >
+      GitHub repo
+    </a>{" "}
+    for the full methodology and limitations.
+  </p>
+  <p>
+    Built by{" "}
+    <a
+      href="https://www.linkedin.com/in/sebastiaan-van-lieshout/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline hover:text-gray-700"
+    >
+      Sebastiaan van Lieshout
+    </a>
+    {" "}— Brand Protection Specialist transitioning into AI engineering.
+  </p>
+</footer>
       </div>
     </main>
   );
