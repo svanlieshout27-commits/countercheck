@@ -2,7 +2,7 @@
 
 **Hybrid ML + LLM counterfeit listing detector.** A scikit-learn classifier scores product listings for counterfeit risk; Llama 3.3-70B explains *why* in plain English.
 
-**Live demo:** [<LIVE_URL>](https://countercheck-eight.vercel.app/)
+**Live demo:** [<https://countercheck-eight.vercel.app/>]
 **Repo:** https://github.com/svanlieshout27-commits/countercheck
 
 ---
