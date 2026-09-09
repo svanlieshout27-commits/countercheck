@@ -21,7 +21,7 @@ CLAUDE_API_KEY = os.environ.get("CLAUDE_API_KEY")
 if not CLAUDE_API_KEY:
     raise RuntimeError("CLAUDE_API_KEY not found. Add it to backend/.env")
 
-CLAUDE_MODEL = "claude-opus-4-1-20250805"
+CLAUDE_MODEL = "claude-3-sonnet-20240229"
 claude_client = Anthropic(api_key=CLAUDE_API_KEY)
 
 try:
