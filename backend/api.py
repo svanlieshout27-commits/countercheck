@@ -1,7 +1,7 @@
 """
 CounterCheck API
 A FastAPI service that scores e-commerce listings for counterfeit risk
-and uses Groq + Llama 3.1-70B to explain the score in plain language.
+and uses Claude to explain the score in plain language.
 """
 
 import os
@@ -11,19 +11,19 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from groq import Groq
+from anthropic import Anthropic
 
 from features import extract_features
 
 # ----- Environment -----
 load_dotenv()
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-if not GROQ_API_KEY:
-    raise RuntimeError("GROQ_API_KEY not found. Add it to backend/.env")
+CLAUDE_API_KEY = os.environ.get("CLAUDE_API_KEY")
+if not CLAUDE_API_KEY:
+    raise RuntimeError("CLAUDE_API_KEY not found. Add it to backend/.env")
 
-GROQ_MODEL = "llama-3.1-70b-versatile"
-groq_client = Groq(api_key=GROQ_API_KEY)
+CLAUDE_MODEL = "claude-3-5-sonnet-20241022"
+claude_client = Anthropic(api_key=CLAUDE_API_KEY)
 
 # ----- Load trained classifier -----
 try:
@@ -75,8 +75,8 @@ def score_listing(listing: Listing) -> tuple[float, str]:
     label = "suspect" if suspect_proba >= 0.5 else "legit"
     return suspect_proba, label
 
-def explain_with_groq(listing: Listing, score: float, label: str) -> str:
-       """Ask Llama 3.1-70B (via Groq) to explain the classification in 2-3 sentences."""
+def explain_with_claude(listing: Listing, score: float, label: str) -> str:
+    """Ask Claude to explain the classification in 2-3 sentences."""
     prompt = (
         f"A counterfeit-detection classifier scored the listing below.\n\n"
         f"Title: {listing.title}\n"
@@ -91,23 +91,20 @@ def explain_with_groq(listing: Listing, score: float, label: str) -> str:
     )
 
     try:
-        response = groq_client.chat.completions.create(
-            model=GROQ_MODEL,
+        response = claude_client.messages.create(
+            model=CLAUDE_MODEL,
             max_tokens=200,
             temperature=0.3,
+            system=(
+                "You are a senior brand-protection analyst. You explain "
+                "counterfeit-detection results in plain, professional "
+                "English. Cite specific signals. Never fabricate facts."
+            ),
             messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a senior brand-protection analyst. You explain "
-                        "counterfeit-detection results in plain, professional "
-                        "English. Cite specific signals. Never fabricate facts."
-                    ),
-                },
                 {"role": "user", "content": prompt},
             ],
         )
-        return response.choices[0].message.content.strip()
+        return response.content[0].text.strip()
     except Exception as e:
         return f"(Explanation unavailable: {e})"
 
@@ -116,7 +113,7 @@ def explain_with_groq(listing: Listing, score: float, label: str) -> str:
 def root():
     return {
         "name": "CounterCheck API",
-        "model": GROQ_MODEL,
+        "model": CLAUDE_MODEL,
         "classifier": "logistic regression with class_weight='balanced'",
         "endpoints": ["/score", "/docs"],
     }
@@ -125,7 +122,7 @@ def root():
 def score(listing: Listing):
     try:
         risk_score, label = score_listing(listing)
-        explanation = explain_with_groq(listing, risk_score, label)
+        explanation = explain_with_claude(listing, risk_score, label)
         return ScoreResponse(
             listing=listing,
             risk_score=round(risk_score, 3),
