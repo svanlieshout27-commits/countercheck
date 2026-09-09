@@ -15,7 +15,6 @@ from anthropic import Anthropic
 
 from features import extract_features
 
-# ----- Environment -----
 load_dotenv()
 
 CLAUDE_API_KEY = os.environ.get("CLAUDE_API_KEY")
@@ -25,21 +24,17 @@ if not CLAUDE_API_KEY:
 CLAUDE_MODEL = "claude-3-5-sonnet-20241022"
 claude_client = Anthropic(api_key=CLAUDE_API_KEY)
 
-# ----- Load trained classifier -----
 try:
     clf = joblib.load("model.joblib")
 except FileNotFoundError:
     raise RuntimeError("model.joblib not found. Run `python train.py` first.")
 
-# ----- FastAPI app -----
 app = FastAPI(
     title="CounterCheck API",
     description="Scores e-commerce listings for counterfeit risk and explains why.",
     version="0.1.0",
 )
 
-# CORS — allow the Next.js frontend (and Swagger UI) to call this API.
-# Tighten allow_origins to your Vercel domain before going public.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -48,7 +43,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ----- Schemas -----
 class Listing(BaseModel):
     title: str = Field(..., example="R0LEX Submariner GENUINE 100% authentic")
     brand: str = Field(..., example="Rolex")
@@ -64,14 +58,13 @@ class ScoreResponse(BaseModel):
     label: str
     explanation: str
 
-# ----- Helpers -----
 def score_listing(listing: Listing) -> tuple[float, str]:
     """Run the trained classifier and return (suspect probability, label)."""
     row = listing.model_dump()
     features = extract_features(row)
     X = pd.DataFrame([features])
     proba = clf.predict_proba(X)[0]
-    suspect_proba = float(proba[1])  # class 1 == suspect
+    suspect_proba = float(proba[1])
     label = "suspect" if suspect_proba >= 0.5 else "legit"
     return suspect_proba, label
 
@@ -108,7 +101,6 @@ def explain_with_claude(listing: Listing, score: float, label: str) -> str:
     except Exception as e:
         return f"(Explanation unavailable: {e})"
 
-# ----- Endpoints -----
 @app.get("/")
 def root():
     return {
