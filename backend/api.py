@@ -1,7 +1,7 @@
 """
 CounterCheck API
 A FastAPI service that scores e-commerce listings for counterfeit risk
-and uses Groq + Llama 3.3-70B to explain the score in plain language.
+and uses Groq + Llama 3.1-70B to explain the score in plain language.
 """
 
 import os
@@ -22,7 +22,7 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 if not GROQ_API_KEY:
     raise RuntimeError("GROQ_API_KEY not found. Add it to backend/.env")
 
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "llama-3.1-70b-versatile"
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 # ----- Load trained classifier -----
@@ -76,7 +76,7 @@ def score_listing(listing: Listing) -> tuple[float, str]:
     return suspect_proba, label
 
 def explain_with_groq(listing: Listing, score: float, label: str) -> str:
-    """Ask Llama 3.3-70B (via Groq) to explain the classification in 2-3 sentences."""
+   """Ask Llama 3.1-70B (via Groq) to explain the classification in 2-3 sentences."""
     prompt = (
         f"A counterfeit-detection classifier scored the listing below.\n\n"
         f"Title: {listing.title}\n"
