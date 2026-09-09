@@ -76,7 +76,7 @@ def score_listing(listing: Listing) -> tuple[float, str]:
     return suspect_proba, label
 
 def explain_with_groq(listing: Listing, score: float, label: str) -> str:
-   """Ask Llama 3.1-70B (via Groq) to explain the classification in 2-3 sentences."""
+       """Ask Llama 3.1-70B (via Groq) to explain the classification in 2-3 sentences."""
     prompt = (
         f"A counterfeit-detection classifier scored the listing below.\n\n"
         f"Title: {listing.title}\n"
